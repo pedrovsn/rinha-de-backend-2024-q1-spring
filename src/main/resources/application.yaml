@@ -1,0 +1,40 @@
+server:
+  port: 8090
+  compression:
+    enabled: true
+    mime-types: application-json
+
+---
+# Default
+spring:
+  config:
+    activate:
+      on-profile: default
+  datasource:
+    url: ${JDBC_CONNECTION}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+
+---
+# Local
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    url: jdbc:postgresql://localhost:5433/rinha
+    username: admin
+    password: 123
+
+---
+
+# Test
+spring:
+  config:
+    activate:
+      on-profile: test
+  datasource:
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password: password
+
