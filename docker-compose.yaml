@@ -2,7 +2,7 @@ version: "3.5"
 
 services:
   api01: &api
-    image: docker.io/library/rinhabackend-java-8
+    build: .
     hostname: api01
     environment:
       - JDBC_CONNECTION=jdbc:postgresql://db:5432/rinha
