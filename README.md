@@ -12,20 +12,34 @@ Submissão em Java + Spring para a Rinha de Backend 2024/Q1
 ![Docker](https://img.shields.io/badge/Docker-2496ED.svg?&style=for-the-badge&logo=docker&logoColor=white)             
 ![ChatGPT](https://img.shields.io/badge/ChatGPT-OpenAI-blueviolet)
 
+Configurações do NGINX by ChatGPT e do Postgres copiadas da submissão do [Gustavo Novaes](https://github.com/gustavonovaes/rinha-backend-2024-go/tree/main)
+
 ## Pré-requisitos
 
-TODO
+- GraalVM CE 17
+- Maven 3.6
+- Postgres 16
+- NGINX 1.25
 
 ## Configuração
 
-TODO
 
 ## Como Rodar
 
+### Local
 ```bash
-docker-compose up
+mvn spring-boot:run -Dspring.profiles.active=local
+```
+
+### Docker
+```bash
+docker-compose up -d
 ```
 
 ## Como executar o teste de carga
+
+```bash 
+./executar-teste-local.sh
+```
 
 TODO
