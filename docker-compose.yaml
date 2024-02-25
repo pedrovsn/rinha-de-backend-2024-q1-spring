@@ -2,7 +2,7 @@ version: "3.5"
 
 services:
   api01: &api
-    image: docker.io/library/rinha-backend-pedrovsn-01
+    image: docker.io/library/rinhabackend-java-8
     hostname: api01
     environment:
       - JDBC_CONNECTION=jdbc:postgresql://db:5432/rinha
@@ -11,12 +11,13 @@ services:
     ports:
       - "8095:8090"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     deploy:
       resources:
         limits:
-          cpus: "0.5"
-          memory: "256MB"
+          cpus: ".35"
+          memory: "100MB"
 
   api02:
     <<: *api
@@ -25,9 +26,9 @@ services:
       - "8096:8090"
 
   nginx:
-    image: nginx:latest
+    image: docker.io/nginx:1.25
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./conf/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - api01
       - api02
@@ -36,11 +37,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.25"
-          memory: "32MB"
+          cpus: ".4"
+          memory: "100MB"
 
   db:
-    image: postgres:latest
+    image: docker.io/postgres:16
     hostname: db
     environment:
       - POSTGRES_PASSWORD=123
@@ -49,15 +50,22 @@ services:
     ports:
       - "5433:5432"
     volumes:
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-    command: postgres -c checkpoint_timeout=600 -c max_wal_size=4096
+      - ./conf/postgresql/postgresql.conf:/etc/postgresql/postgresql.conf:ro
+      - ./conf/postgresql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-d", "db_prod"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
     deploy:
       resources:
         limits:
-          cpus: "0.5"
-          memory: "256MB"
+          cpus: ".4"
+          memory: "250MB"
 
 networks:
   default:
-    driver: bridge
+    driver: host
     name: rinha-nginx-2024q1

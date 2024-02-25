@@ -1,8 +1,5 @@
 server:
   port: 8090
-  compression:
-    enabled: true
-    mime-types: application-json
 
 ---
 # Default
@@ -14,6 +11,7 @@ spring:
     url: ${JDBC_CONNECTION}
     username: ${DB_USER}
     password: ${DB_PASSWORD}
+    type: com.zaxxer.hikari.HikariDataSource
 
 ---
 # Local
@@ -25,6 +23,7 @@ spring:
     url: jdbc:postgresql://localhost:5433/rinha
     username: admin
     password: 123
+    type: com.zaxxer.hikari.HikariDataSource
 
 ---
 

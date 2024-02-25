@@ -4,14 +4,15 @@ import io.github.pedrovsn.rinhabackend.domain.Customer;
 import io.github.pedrovsn.rinhabackend.domain.CustomerCurrentStatus;
 import io.github.pedrovsn.rinhabackend.domain.CustomerTransactions;
 import io.github.pedrovsn.rinhabackend.domain.Transaction;
+import io.github.pedrovsn.rinhabackend.exception.*;
 import io.github.pedrovsn.rinhabackend.repository.CustomerRepository;
 import io.github.pedrovsn.rinhabackend.repository.TransactionRepository;
 import io.github.pedrovsn.rinhabackend.service.TransactionService;
+import java.util.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
@@ -37,11 +38,15 @@ public class TransactionServiceImpl implements TransactionService {
             String description
     ) {
         if (!isValidCustomerId(customerId)) {
-            throw new RuntimeException("Invalid customerId");
+            throw new CustomerNotFoundException("Invalid customerId");
         }
 
-        if(!isValidTransactionType(type)) {
-            throw new RuntimeException("Invalid transaction tipo");
+        if (!isValidTransactionType(type)) {
+            throw new InvalidAttributeException("Invalid transaction type");
+        }
+
+        if (!isValidDescription(description)) {
+            throw new InvalidAttributeException("Invalid description");
         }
 
         Customer customer = customerRepository.findCustomerById(customerId);
@@ -56,7 +61,7 @@ public class TransactionServiceImpl implements TransactionService {
                 int maxValue = currentBalance + customer.creditLimit();
 
                 if (amount > maxValue) {
-                    throw new RuntimeException("Transaction amount exceeds customer limit");
+                    throw new InsufficientFundsException("Transaction amount exceeds customer limit");
                 }
 
                 currentBalance -= amount;
@@ -91,7 +96,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public CustomerTransactions getCustomerTransactions(int customerId) {
         if (!isValidCustomerId(customerId)) {
-            throw new RuntimeException("Invalid customerId");
+            throw new CustomerNotFoundException("Invalid customerId");
         }
 
         Customer customer = customerRepository.findCustomerById(customerId);
@@ -112,5 +117,21 @@ public class TransactionServiceImpl implements TransactionService {
 
     private boolean isValidTransactionType(String transactionType) {
         return "c".equals(transactionType) || "d".equals(transactionType);
+    }
+
+    private boolean isValidDescription(String description) {
+        if (Objects.isNull(description)) {
+            return false;
+        }
+
+        if (description.isBlank()) {
+            return false;
+        }
+
+        if (description.length() > 10) {
+            return false;
+        }
+
+        return true;
     }
 }

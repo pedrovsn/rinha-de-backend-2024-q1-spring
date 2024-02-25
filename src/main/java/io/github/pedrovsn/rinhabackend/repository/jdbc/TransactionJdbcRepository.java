@@ -2,7 +2,11 @@ package io.github.pedrovsn.rinhabackend.repository.jdbc;
 
 import io.github.pedrovsn.rinhabackend.domain.Transaction;
 import io.github.pedrovsn.rinhabackend.repository.TransactionRepository;
-import org.springframework.jdbc.core.JdbcTemplate;
+import java.sql.*;
+import org.springframework.dao.*;
+import org.springframework.jdbc.core.*;
+import org.springframework.jdbc.core.namedparam.*;
+import org.springframework.jdbc.core.simple.*;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -20,21 +24,32 @@ public class TransactionJdbcRepository implements TransactionRepository {
     @Override
     public void save(Transaction transaction) {
         jdbcTemplate.update("""
-                        INSERT INTO transaction (customer_id, amount, tipo, descricao, created_at)
+                        INSERT INTO transaction (customer_id, amount, type, description, created_at)
                         VALUES (?, ?, ?, ?, ?)
                         """,
                 transaction.customerId(),
                 transaction.amount(),
-                transaction.type(),
+                transaction.type().charAt(0),
                 transaction.description(),
                 transaction.createdAt()
         );
     }
 
+//    @Override
+//    public void save(Transaction transaction) {
+//        jdbcTemplate.update(
+//                "CALL update_balance_and_create_transaction(?,?,?,?)",
+//                transaction.customerId(),
+//                transaction.amount(),
+//                transaction.type(),
+//                transaction.description()
+//        );
+//    }
+
     @Override
     public List<Transaction> findTransactionsByCustomerId(int customerId, int limit) {
         return jdbcTemplate.query("""
-                SELECT id, customer_id, amount, tipo, descricao, created_at
+                SELECT id, customer_id, amount, type, description, created_at
                 FROM transaction
                 WHERE customer_id = ? ORDER BY id DESC LIMIT ?
                 """, new Object[]{customerId, limit}, rs -> {
@@ -46,7 +61,7 @@ public class TransactionJdbcRepository implements TransactionRepository {
                                         rs.getInt("customer_id"),
                                         rs.getInt("amount"),
                                         rs.getString("type"),
-                                        rs.getString("descricao"),
+                                        rs.getString("description"),
                                         rs.getTimestamp("created_at").toLocalDateTime()
                                 )
                         );
