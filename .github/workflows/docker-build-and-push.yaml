@@ -24,4 +24,4 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: pedrovsn/rinha-de-backend-2024-q1-spring:latest
+          tags: pedrovsn/rinha-de-backend-2024-q1-spring:build-${{ github.run_number }}
