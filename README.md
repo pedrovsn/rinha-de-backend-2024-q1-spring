@@ -42,4 +42,6 @@ docker-compose up -d
 ./executar-teste-local.sh
 ```
 
-TODO
+## Resultado
+
+![Resultado](result.png)

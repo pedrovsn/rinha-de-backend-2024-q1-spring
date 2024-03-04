@@ -29,23 +29,3 @@ BEGIN
 		('kid mais', 5000 * 100, 0);
 END;
 $$;
-
-CREATE OR REPLACE PROCEDURE update_balance_and_create_transaction(
-    p_customer_id INTEGER,
-    p_amount INTEGER,
-    p_type CHAR,
-    p_description VARCHAR
-)
-LANGUAGE plpgsql
-AS $$
-BEGIN
-    IF p_type = 'd' THEN
-        UPDATE customer SET balance = balance - p_amount WHERE id = p_customer_id;
-    ELSIF p_type = 'c' THEN
-        UPDATE customer SET balance = balance + p_amount WHERE id = p_customer_id;
-    END IF;
-
-    INSERT INTO transaction (customer_id, amount, type, description)
-    VALUES (p_customer_id, p_amount, p_type, p_description);
-END;
-$$;
